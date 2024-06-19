@@ -1,8 +1,21 @@
-const userRoute = require('express').Router()
-const UserController = require('../controllers/UserController')
+const express = require('express');
+const multer = require('multer');
+const UserController = require('../controllers/UserController');
 
-userRoute.post('/register', UserController.register)
-userRoute.post('/login', UserController.login)
-userRoute.post('/upload', UserController.upload)
+const userRoute = express.Router();
 
-module.exports = userRoute
+const fileStorage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        cb(null, 'images');
+    },
+    filename: (req, file, cb) => {
+        cb(null, new Date().toISOString().replace(/:/g, '-') + '-' + file.originalname);
+    }
+});
+
+const upload = multer({ storage: fileStorage });
+
+userRoute.post('/register', upload.single('image'), UserController.register);
+userRoute.post('/login', UserController.login);
+
+module.exports = userRoute;

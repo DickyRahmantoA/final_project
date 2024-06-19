@@ -9,11 +9,20 @@ class ProductController {
                     as: 'category'
                 }]
             });
-            res.json(products);
+            res.json({
+                success: true,
+                message: 'Berhasil Mengambil Data',
+                data: products
+            });
         } catch (error) {
-            res.status(500).json({ error: error.message });
+            res.status(500).json({
+                success: false,
+                message: 'Gagal Mengambil Data',
+                error: error.message
+            });
         }
     }
+
 
     static async getProductsById(req, res) {
         const { id } = req.params;
@@ -25,25 +34,43 @@ class ProductController {
                 }]
             });
             if (product) {
-                res.json(product);
+                res.json({
+                    success: true,
+                    message: 'Berhasil Mengambil Data',
+                    data: product
+                });
             } else {
-                res.status(404).json({ error: 'Product not found' });
+                res.json({
+                    success: false,
+                    message: 'Gagal Mengambil Data'
+                });
             }
         } catch (error) {
-            res.status(500).json({ error: error.message });
+            res.status(500).json({
+                success: false,
+                message: error.message
+            });
         }
     }
+
 
 
     static async add(req, res) {
         const { name, qty, categoryId, url, createdBy } = req.body;
         try {
-            const product = await Product.create({ name, qty, categoryId, url, createdBy, updatedBy: createdBy });
-            res.json(product);
+            await Product.create({ name, qty, categoryId, url, createdBy, updatedBy: createdBy });
+            res.json({
+                success: true,
+                message: 'Berhasil Menyimpan Data'
+            });
         } catch (error) {
-            res.status(500).json({ error: error.message });
+            res.status(500).json({
+                success: false,
+                message: 'Gagal Menyimpan Data'
+            });
         }
     }
+
 
     static async update(req, res) {
         const { id } = req.params;
@@ -52,14 +79,15 @@ class ProductController {
             const product = await Product.findByPk(id);
             if (product) {
                 await product.update({ name, qty, categoryId, url, createdBy, updatedBy });
-                res.json(product);
+                res.json({ success: true, message: 'Data berhasil diedit', product });
             } else {
-                res.status(404).json({ error: 'Product not found' });
+                res.status(404).json({ success: false, message: 'Produk tidak ditemukan' });
             }
         } catch (error) {
-            res.status(500).json({ error: error.message });
+            res.status(500).json({ success: false, message: error.message });
         }
     }
+
 
     static async delete(req, res) {
         const { id } = req.params;
@@ -67,14 +95,15 @@ class ProductController {
             const product = await Product.findByPk(id);
             if (product) {
                 await product.destroy();
-                res.json({ message: 'Product deleted' });
+                res.json({ success: true, message: 'Berhasil Hapus Data' });
             } else {
-                res.status(404).json({ error: 'Product not found' });
+                res.json({ success: false, error: 'Gagal Hapus Data' });
             }
         } catch (error) {
-            res.status(500).json({ error: error.message });
+            res.status(500).json({ success: false, error: error.message });
         }
     }
+
 }
 
 module.exports = ProductController
